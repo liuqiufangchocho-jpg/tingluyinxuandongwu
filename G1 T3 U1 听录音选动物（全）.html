@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G1 T3 U1动物录音选择-猫狗鸟鱼马</title>
+    <!-- 引入 html2canvas 用于保存报告 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+
+        :root {
+            --primary-orange: #ff9d00;
+            --secondary-green: #8bc34a;
+            --bg-color: #f0f9ff;
+            --card-bg: #ffffff;
+            --text-color: #5d4037;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#dcedc8 10%, transparent 10%);
+            background-size: 30px 30px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 楷体样式 */
+        .kaiti {
+            font-family: 'Ma Shan Zheng', 'Kaiti', 'STKaiti', serif;
+        }
+
+        .question-text-style {
+            font-size: 2.2rem;
+        }
+
+        ruby {
+            ruby-align: center;
+            margin: 0 5px;
+        }
+
+        rt {
+            font-family: sans-serif;
+            font-size: 0.5em;
+            color: #ff5722;
+            font-weight: bold;
+        }
+
+        #app-container {
+            width: 95%;
+            max-width: 650px;
+            background: var(--card-bg);
+            border: 8px solid var(--primary-orange);
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: 0 20px 0 #e68a00, 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 提示语样式 */
+        .instruction-text {
+            color: #2e7d32;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-style: italic;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 游戏主体 */
+        .quiz-box {
+            text-align: center;
+        }
+
+        .question-card {
+            background: #f1f8e9;
+            padding: 25px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            border: 3px solid var(--secondary-green);
+        }
+
+        .audio-btn {
+            font-size: 2.2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: transform 0.2s;
+            vertical-align: middle;
+        }
+
+        .audio-btn:hover { transform: scale(1.2); }
+
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            min-height: 120px;
+        }
+
+        .option-btn {
+            padding: 15px 25px;
+            background: white;
+            border: 4px solid #ddd;
+            border-radius: 20px;
+            font-size: 3.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 0 #ddd;
+        }
+
+        .option-btn:hover { transform: translateY(-2px); }
+
+        .option-btn.correct {
+            border-color: var(--secondary-green);
+            background: #e8f5e9;
+            box-shadow: 0 6px 0 var(--secondary-green);
+        }
+
+        .option-btn.wrong {
+            border-color: #ff5252;
+            background: #ffebee;
+            box-shadow: 0 6px 0 #ff5252;
+            animation: shake 0.4s;
+        }
+
+        /* 星星系统 */
+        .stars-container {
+            font-size: 2.2rem;
+            margin: 20px 0;
+            color: #ffca28;
+            letter-spacing: 3px;
+        }
+
+        /* 导航按钮 */
+        .next-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary-green);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #558b2f;
+            display: none;
+            z-index: 10;
+        }
+
+        .next-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #558b2f;
+        }
+
+        /* 开始界面样式 */
+        #start-screen {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .game-title {
+            color: var(--primary-orange);
+            font-size: 3rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0 0 15px 0;
+        }
+
+        .game-desc {
+            color: #2e7d32;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin: 0 0 40px 0;
+        }
+
+        .start-btn {
+            background: none;
+            border: none;
+            font-size: 5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            animation: pulse 1.5s infinite;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        #quiz-main {
+            display: none;
+        }
+
+        /* 报告单 Modal */
+        #report-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .report-card {
+            background: white;
+            width: 480px;
+            padding: 20px 40px 30px 40px; 
+            border-radius: 30px;
+            text-align: center;
+            border: 10px solid var(--primary-orange);
+            position: relative;
+            max-height: 90vh; 
+            overflow-y: auto;
+        }
+
+        .trophy-large {
+            font-size: 4rem; 
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .report-card h2 {
+            color: var(--primary-orange);
+            margin-top: 0;
+            margin-bottom: 10px; 
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--primary-orange);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .congrats-text {
+            font-size: 2rem;
+            color: var(--secondary-green);
+            margin: 15px 0;
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .report-info {
+            font-size: 1.2rem;
+            margin: 10px 0; 
+            text-align: left;
+            padding: 0 10px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+
+        .save-btn {
+            margin-top: 20px; 
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1976d2;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- 开始界面 -->
+        <div id="start-screen">
+            <h1 class="game-title">Animal Audio Quiz</h1>
+            <p class="game-desc">Please click the speaker to listen and select the correct answer.</p>
+            <button class="start-btn" onclick="startGame()">👉</button>
+        </div>
+
+        <!-- 测验内容 -->
+        <div id="quiz-main" class="quiz-box">
+            <div class="question-card">
+                <div id="question-text" class="kaiti question-text-style">
+                    <!-- 动态注入题目 -->
+                </div>
+            </div>
+
+            <div id="options" class="options-container">
+                <!-- 动态注入选项 -->
+            </div>
+
+            <!-- 星星调整为10颗 -->
+            <div class="stars-container" id="stars-display">
+                ☆ ☆ ☆ ☆ ☆ ☆ ☆ ☆ ☆ ☆
+            </div>
+
+            <button id="next-button" class="next-btn" onclick="nextQuestion()">Next ➔</button>
+        </div>
+    </div>
+
+    <!-- 报告单弹窗 (CERTIFICATE) -->
+    <div id="report-modal">
+        <div class="report-card" id="final-report">
+            <span class="trophy-large">🏆</span>
+            <h2 style="font-family: 'Segoe UI', sans-serif;">CERTIFICATE</h2>
+            
+            <div class="report-info kaiti">
+                <strong><ruby>成绩<rt>chéng jì</rt></ruby> Score:</strong> <span id="res-stars" style="color:#ffca28; font-size: 1.5rem; font-family: sans-serif;"></span>
+            </div>
+            <div class="report-info kaiti">
+                <strong><ruby>日期<rt>rì qī</rt></ruby> Date:</strong> <span id="res-date" style="font-family: sans-serif;"></span>
+            </div>
+            
+            <div class="kaiti" style="margin-top: 15px; font-size: 1.1rem; color: #2e7d32;">
+                <ruby>太<rt>tài</rt></ruby><ruby>棒<rt>bàng</rt></ruby><ruby>了<rt>le</rt></ruby>！
+                <ruby>你<rt>nǐ</rt></ruby><ruby>真<rt>zhēn</rt></ruby><ruby>了<rt>liǎo</rt></ruby><ruby>不<rt>bu</rt></ruby><ruby>起<rt>qǐ</rt></ruby>！
+            </div>
+            
+            <button class="save-btn" onclick="saveReport()">💾 Save حفظ التقرير</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // 前4题，2个选项
+            { word: "猫", pinyin: "māo", options: ["🐱", "🐶"], correct: 0 },
+            { word: "狗", pinyin: "gǒu", options: ["🐴", "🐶"], correct: 1 },
+            { word: "鸟", pinyin: "niǎo", options: ["🐦", "🐟"], correct: 0 },
+            { word: "鱼", pinyin: "yú", options: ["🐑", "🐟"], correct: 1 },
+            // 中间4题，3个选项
+            { word: "马", pinyin: "mǎ", options: ["🐶", "🐴", "🐮"], correct: 1 },
+            { word: "牛", pinyin: "niú", options: ["🐮", "🐼", "🐯"], correct: 0 },
+            { word: "羊", pinyin: "yáng", options: ["🐫", "🐱", "🐑"], correct: 2 },
+            { word: "熊猫", pinyin: "xióng māo", options: ["🐯", "🐼", "🐦"], correct: 1 },
+            // 最后2题，4个选项
+            { word: "老虎", pinyin: "lǎo hǔ", options: ["🐟", "🐴", "🐮", "🐯"], correct: 3 },
+            { word: "骆驼", pinyin: "luò tuo", options: ["🐫", "🐑", "🐼", "🐶"], correct: 0 }
+        ];
+
+        let currentStep = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-main').style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const data = quizData[currentStep];
+            const qText = document.getElementById('question-text');
+            const optsContainer = document.getElementById('options');
+            const nextBtn = document.getElementById('next-button');
+
+            nextBtn.style.display = 'none';
+
+            qText.innerHTML = `
+                <ruby>${data.word}<rt>${data.pinyin}</rt></ruby>
+                <button class="audio-btn" onclick="playVoice('${data.word}')">📢</button>
+            `;
+
+            optsContainer.innerHTML = '';
+            data.options.forEach((emoji, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = emoji;
+                btn.onclick = () => handleAnswer(index, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(index, btn) {
+            if (isAnswered) return;
+
+            const correctIdx = quizData[currentStep].correct;
+            if (index === correctIdx) {
+                isAnswered = true;
+                score++;
+                btn.classList.add('correct');
+                updateStars();
+                document.getElementById('next-button').style.display = 'block';
+                playTone(600, 0.1);
+                setTimeout(() => playTone(800, 0.2), 100);
+            } else {
+                btn.classList.add('wrong');
+                playTone(200, 0.3);
+                setTimeout(() => btn.classList.remove('wrong'), 500);
+            }
+        }
+
+        function updateStars() {
+            // 总共10题，需要更新10颗星星
+            const stars = "★ ".repeat(score) + "☆ ".repeat(10 - score);
+            document.getElementById('stars-display').textContent = stars.trim();
+        }
+
+        function nextQuestion() {
+            currentStep++;
+            if (currentStep < quizData.length) {
+                loadQuestion();
+            } else {
+                showReport();
+            }
+        }
+
+        function playVoice(text) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'zh-CN';
+            msg.rate = 0.8;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function playTone(freq, duration) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+                osc.stop(ctx.currentTime + duration);
+            } catch(e) { console.log("Audio not supported"); }
+        }
+
+        function showReport() {
+            document.getElementById('res-stars').textContent = "★ ".repeat(score);
+            document.getElementById('res-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('report-modal').style.display = 'flex';
+        }
+
+        function saveReport() {
+            const element = document.getElementById('final-report');
+            const saveBtn = document.querySelector('.save-btn');
+            saveBtn.style.visibility = 'hidden';
+
+            html2canvas(element, {
+                backgroundColor: "#ffffff",
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Certificate.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                saveBtn.style.visibility = 'visible';
+            });
+        }
+    </script>
+</body>
+</html>
